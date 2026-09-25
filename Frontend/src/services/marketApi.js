@@ -10,7 +10,6 @@ export async function getMarketData(
   period = "1mo",
   interval = "1d"
 ) {
-
   const response = await fetch(
     `${API_BASE_URL}/market/${encodeURIComponent(
       symbol
@@ -28,18 +27,16 @@ export async function getMarketData(
   }
 
   if (!response.ok) {
-
     throw new Error(
       result.message ||
-      "Failed to fetch market data."
+        "Failed to fetch market data."
     );
   }
 
   if (!result.success) {
-
     throw new Error(
       result.message ||
-      "Unable to fetch market data."
+        "Unable to fetch market data."
     );
   }
 
@@ -52,7 +49,6 @@ export async function getMarketData(
 // ======================================================
 
 export async function searchStocks(query) {
-
   const cleanQuery =
     query?.trim() || "";
 
@@ -77,22 +73,57 @@ export async function searchStocks(query) {
   }
 
   if (!response.ok) {
-
     throw new Error(
       result.message ||
-      "Failed to search stocks."
+        "Failed to search stocks."
     );
   }
 
   if (!result.success) {
-
     throw new Error(
       result.message ||
-      "Unable to search stocks."
+        "Unable to fetch search results."
     );
   }
 
   return result.results || [];
+}
+
+
+// ======================================================
+// LIVE NIFTY + SENSEX
+// ======================================================
+
+export async function getIndices() {
+  const response = await fetch(
+    `${API_BASE_URL}/indices`
+  );
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error(
+      "Invalid response from index server."
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      result.message ||
+        "Failed to fetch index data."
+    );
+  }
+
+  if (!result.success) {
+    throw new Error(
+      result.message ||
+        "Unable to fetch index data."
+    );
+  }
+
+  return result.indices || [];
 }
 
 
@@ -105,12 +136,10 @@ export async function optimizePortfolio({
   investmentAmount,
   risk
 }) {
-
   if (
     !Array.isArray(symbols) ||
     symbols.length === 0
   ) {
-
     throw new Error(
       "Select at least one stock."
     );
@@ -120,7 +149,6 @@ export async function optimizePortfolio({
     !investmentAmount ||
     Number(investmentAmount) <= 0
   ) {
-
     throw new Error(
       "Enter a valid investment amount."
     );
@@ -155,20 +183,18 @@ export async function optimizePortfolio({
   }
 
   if (!response.ok) {
-
     throw new Error(
       result.error ||
-      result.message ||
-      "Portfolio optimization failed."
+        result.message ||
+        "Portfolio optimization failed."
     );
   }
 
   if (!result.success) {
-
     throw new Error(
       result.error ||
-      result.message ||
-      "Portfolio optimization failed."
+        result.message ||
+        "Portfolio optimization failed."
     );
   }
 

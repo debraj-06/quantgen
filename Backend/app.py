@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import yfinance as yf
 
 from services.market_service import (
     get_stock_data,
@@ -32,7 +33,10 @@ def home():
 # STOCK SEARCH
 # =========================================================
 
-@app.route("/api/search", methods=["GET"])
+@app.route(
+    "/api/search",
+    methods=["GET"]
+)
 def search():
 
     query = request.args.get(
@@ -49,7 +53,9 @@ def search():
 
     try:
 
-        results = search_stocks(query)
+        results = search_stocks(
+            query
+        )
 
         return jsonify({
             "success": True,
@@ -58,7 +64,10 @@ def search():
 
     except Exception as error:
 
-        print("Stock search error:", error)
+        print(
+            "Stock search error:",
+            error
+        )
 
         return jsonify({
             "success": False,
@@ -123,6 +132,172 @@ def market_data(symbol):
 
 
 # =========================================================
+# LIVE NIFTY + SENSEX
+# =========================================================
+
+@app.route(
+    "/api/indices",
+    methods=["GET"]
+)
+def indices():
+
+    index_config = {
+        "NIFTY 50": "^NSEI",
+        "SENSEX": "^BSESN"
+    }
+
+    results = []
+
+
+    for name, symbol in index_config.items():
+
+        try:
+
+            ticker = yf.Ticker(
+                symbol
+            )
+
+
+            # ------------------------------------------------
+            # Recent intraday data
+            # ------------------------------------------------
+
+            intraday = ticker.history(
+                period="2d",
+                interval="1m",
+                auto_adjust=False
+            )
+
+
+            if intraday.empty:
+
+                raise ValueError(
+                    f"No intraday data available for {name}"
+                )
+
+
+            intraday = intraday.dropna(
+                subset=["Close"]
+            )
+
+
+            if intraday.empty:
+
+                raise ValueError(
+                    f"No valid price available for {name}"
+                )
+
+
+            latest_price = float(
+                intraday["Close"].iloc[-1]
+            )
+
+
+            # ------------------------------------------------
+            # Previous trading day's close
+            # ------------------------------------------------
+
+            daily = ticker.history(
+                period="5d",
+                interval="1d",
+                auto_adjust=False
+            )
+
+
+            daily = daily.dropna(
+                subset=["Close"]
+            )
+
+
+            if len(daily) >= 2:
+
+                previous_close = float(
+                    daily["Close"].iloc[-2]
+                )
+
+            else:
+
+                previous_close = latest_price
+
+
+            change = (
+                latest_price -
+                previous_close
+            )
+
+
+            change_percent = (
+
+                change /
+                previous_close *
+                100
+
+                if previous_close != 0
+
+                else 0
+
+            )
+
+
+            results.append({
+
+                "name": name,
+
+                "symbol": symbol,
+
+                "price": round(
+                    latest_price,
+                    2
+                ),
+
+                "change": round(
+                    change,
+                    2
+                ),
+
+                "change_percent": round(
+                    change_percent,
+                    2
+                )
+
+            })
+
+
+        except Exception as error:
+
+            print(
+                f"Index error for {name}:",
+                error
+            )
+
+
+            results.append({
+
+                "name": name,
+
+                "symbol": symbol,
+
+                "price": None,
+
+                "change": None,
+
+                "change_percent": None,
+
+                "error": str(error)
+
+            })
+
+
+    return jsonify({
+
+        "success": True,
+
+        "indices": results
+
+    })
+
+
+# =========================================================
 # AI PORTFOLIO OPTIMIZER
 # =========================================================
 
@@ -138,6 +313,7 @@ def optimize_portfolio():
             silent=True
         ) or {}
 
+
         # -------------------------------------------------
         # GET INPUTS
         # -------------------------------------------------
@@ -147,15 +323,18 @@ def optimize_portfolio():
             []
         )
 
+
         investment_amount = payload.get(
             "investment_amount",
             0
         )
 
+
         risk = payload.get(
             "risk",
             "medium"
         )
+
 
         # -------------------------------------------------
         # VALIDATE SYMBOLS
@@ -171,16 +350,24 @@ def optimize_portfolio():
                 "error": "symbols must be a list"
             }), 400
 
+
         symbols = [
+
             str(symbol).strip().upper()
+
             for symbol in symbols
+
             if str(symbol).strip()
+
         ]
 
-        # Remove duplicates
+
         symbols = list(
-            dict.fromkeys(symbols)
+            dict.fromkeys(
+                symbols
+            )
         )
+
 
         if len(symbols) == 0:
 
@@ -188,6 +375,7 @@ def optimize_portfolio():
                 "success": False,
                 "error": "Select at least one stock."
             }), 400
+
 
         # -------------------------------------------------
         # VALIDATE INVESTMENT
@@ -209,12 +397,14 @@ def optimize_portfolio():
                 "error": "Investment amount must be a number."
             }), 400
 
+
         if investment_amount <= 0:
 
             return jsonify({
                 "success": False,
                 "error": "Investment amount must be greater than 0."
             }), 400
+
 
         # -------------------------------------------------
         # VALIDATE RISK
@@ -223,6 +413,7 @@ def optimize_portfolio():
         risk = str(
             risk
         ).lower().strip()
+
 
         if risk not in [
             "low",
@@ -235,25 +426,37 @@ def optimize_portfolio():
                 "error": "Risk must be low, medium, or high."
             }), 400
 
+
         # -------------------------------------------------
         # RUN AI + GENETIC ALGORITHM
         # -------------------------------------------------
 
         result = analyze_portfolio(
+
             symbols=symbols,
-            investment_amount=investment_amount,
+
+            investment_amount=
+                investment_amount,
+
             risk=risk,
+
             prediction_days=3
+
         )
+
 
         # -------------------------------------------------
         # RETURN RESULT
         # -------------------------------------------------
 
         return jsonify({
+
             "success": True,
+
             **result
+
         })
+
 
     except Exception as error:
 
@@ -262,9 +465,13 @@ def optimize_portfolio():
             error
         )
 
+
         return jsonify({
+
             "success": False,
+
             "error": str(error)
+
         }), 500
 
 
@@ -275,7 +482,11 @@ def optimize_portfolio():
 if __name__ == "__main__":
 
     app.run(
+
         host="0.0.0.0",
+
         port=5000,
+
         debug=True
+
     )
