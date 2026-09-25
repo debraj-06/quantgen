@@ -1,6 +1,10 @@
 const API_BASE_URL = "http://127.0.0.1:5000/api";
 
 
+// ======================================================
+// MARKET DATA
+// ======================================================
+
 export async function getMarketData(
   symbol,
   period = "1mo",
@@ -13,18 +17,29 @@ export async function getMarketData(
     )}?period=${period}&interval=${interval}`
   );
 
-  if (!response.ok) {
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
     throw new Error(
-      "Failed to fetch market data"
+      "Invalid response from market server."
     );
   }
 
-  const result = await response.json();
+  if (!response.ok) {
 
-  if (!result.success) {
     throw new Error(
       result.message ||
-      "Unable to fetch market data"
+      "Failed to fetch market data."
+    );
+  }
+
+  if (!result.success) {
+
+    throw new Error(
+      result.message ||
+      "Unable to fetch market data."
     );
   }
 
@@ -32,32 +47,130 @@ export async function getMarketData(
 }
 
 
+// ======================================================
+// STOCK SEARCH
+// ======================================================
+
 export async function searchStocks(query) {
 
-  if (!query.trim()) {
+  const cleanQuery =
+    query?.trim() || "";
+
+  if (!cleanQuery) {
     return [];
   }
 
   const response = await fetch(
     `${API_BASE_URL}/search?q=${encodeURIComponent(
-      query
+      cleanQuery
     )}`
   );
 
-  if (!response.ok) {
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
     throw new Error(
-      "Failed to search stocks"
+      "Invalid response from search server."
     );
   }
 
-  const result = await response.json();
+  if (!response.ok) {
 
-  if (!result.success) {
     throw new Error(
       result.message ||
-      "Unable to search stocks"
+      "Failed to search stocks."
     );
   }
 
-  return result.results;
+  if (!result.success) {
+
+    throw new Error(
+      result.message ||
+      "Unable to search stocks."
+    );
+  }
+
+  return result.results || [];
+}
+
+
+// ======================================================
+// AI PORTFOLIO OPTIMIZER
+// ======================================================
+
+export async function optimizePortfolio({
+  symbols,
+  investmentAmount,
+  risk
+}) {
+
+  if (
+    !Array.isArray(symbols) ||
+    symbols.length === 0
+  ) {
+
+    throw new Error(
+      "Select at least one stock."
+    );
+  }
+
+  if (
+    !investmentAmount ||
+    Number(investmentAmount) <= 0
+  ) {
+
+    throw new Error(
+      "Enter a valid investment amount."
+    );
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/portfolio/optimize`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        symbols,
+        investment_amount:
+          Number(investmentAmount),
+        risk
+      })
+    }
+  );
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error(
+      "Invalid response from AI server."
+    );
+  }
+
+  if (!response.ok) {
+
+    throw new Error(
+      result.error ||
+      result.message ||
+      "Portfolio optimization failed."
+    );
+  }
+
+  if (!result.success) {
+
+    throw new Error(
+      result.error ||
+      result.message ||
+      "Portfolio optimization failed."
+    );
+  }
+
+  return result;
 }

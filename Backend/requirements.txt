@@ -1,6 +1,8 @@
-Flask
-Flask-CORS
+flask
+flask-cors
+python-dotenv
 yfinance
 pandas
 numpy
-python-dotenv
+scikit-learn
+joblib

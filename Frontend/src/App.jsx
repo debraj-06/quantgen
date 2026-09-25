@@ -1,7 +1,7 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Markets from "./components/Markets";
-import StrategyLab from "./components/StrategyLab";
+import PortfolioOptimizer from "./components/PortfolioOptimizer";
 
 function App() {
   return (
@@ -13,8 +13,10 @@ function App() {
 
       <main>
         <Hero />
+
         <Markets />
-        <StrategyLab />
+
+        <PortfolioOptimizer />
       </main>
     </div>
   );
