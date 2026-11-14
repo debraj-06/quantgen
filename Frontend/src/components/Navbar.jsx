@@ -1,3 +1,4 @@
+
 import {
   Activity,
   ArrowUpRight,
@@ -39,6 +40,10 @@ function Navbar() {
     {
       name: "Portfolio",
       href: "#portfolio",
+    },
+    {
+      name: "Tracker",
+      href: "#tracker",
     },
   ];
 
@@ -164,9 +169,7 @@ function Navbar() {
           "
         >
 
-          {/* ================================================== */}
           {/* BRAND */}
-          {/* ================================================== */}
 
           <a
             href="#top"
@@ -183,8 +186,6 @@ function Navbar() {
 
             <div className="min-w-0">
 
-              {/* BRAND NAME */}
-
               <div
                 className="
                   whitespace-nowrap
@@ -195,16 +196,11 @@ function Navbar() {
                   lg:text-2xl
                 "
               >
-
                 QUANT
                 <span className="text-emerald-300">
                   GEN
                 </span>
-
               </div>
-
-
-              {/* TAGLINE */}
 
               <div
                 className="
@@ -222,9 +218,7 @@ function Navbar() {
                   lg:tracking-[0.24em]
                 "
               >
-
                 Adaptive Trading Intelligence
-
               </div>
 
             </div>
@@ -232,61 +226,39 @@ function Navbar() {
           </a>
 
 
-          {/* ================================================== */}
           {/* DESKTOP NAVIGATION */}
-          {/* ================================================== */}
 
-          <nav
-            className="
-              hidden
-              items-center
-              gap-1
-              lg:flex
-            "
-          >
+          <nav className="hidden items-center gap-1 lg:flex">
 
-            {links.map(
-              (link) => (
+            {links.map((link) => (
 
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="
-                    rounded-xl
-                    px-4
-                    py-3
-                    text-sm
-                    font-semibold
-                    text-white/45
-                    transition
-                    hover:bg-white/[0.04]
-                    hover:text-white
-                    xl:px-5
-                  "
-                >
+              <a
+                key={link.name}
+                href={link.href}
+                className="
+                  rounded-xl
+                  px-4
+                  py-3
+                  text-sm
+                  font-semibold
+                  text-white/45
+                  transition
+                  hover:bg-white/[0.04]
+                  hover:text-white
+                  xl:px-5
+                "
+              >
+                {link.name}
+              </a>
 
-                  {link.name}
-
-                </a>
-
-              )
-            )}
+            ))}
 
           </nav>
 
 
-          {/* ================================================== */}
           {/* RIGHT DESKTOP AREA */}
-          {/* ================================================== */}
 
-          <div
-            className="
-              hidden
-              items-center
-              gap-3
-              lg:flex
-            "
-          >
+          <div className="hidden items-center gap-3 lg:flex">
 
             {/* LIVE MARKET STATUS */}
 
@@ -328,9 +300,7 @@ function Navbar() {
                   xl:tracking-[0.14em]
                 "
               >
-
                 Live Market Data
-
               </span>
 
             </div>
@@ -338,9 +308,7 @@ function Navbar() {
 
             {/* NIFTY MINI */}
 
-            <IndexMini
-              index={nifty}
-            />
+            <IndexMini index={nifty} />
 
 
             {/* LAUNCH LAB */}
@@ -348,50 +316,36 @@ function Navbar() {
             <a
               href="#portfolio"
               className="
-                group
                 flex
                 items-center
                 gap-2
-                rounded-full
+                rounded-xl
                 bg-emerald-300
-                px-5
+                px-4
                 py-3
-                text-xs
+                text-sm
                 font-bold
                 text-[#07100d]
                 transition
                 hover:bg-emerald-200
-                xl:px-6
-                xl:text-sm
               "
             >
 
               Launch Lab
 
-              <ArrowUpRight
-                size={15}
-                className="
-                  transition-transform
-                  group-hover:-translate-y-0.5
-                  group-hover:translate-x-0.5
-                "
-              />
+              <ArrowUpRight size={16} />
 
             </a>
 
           </div>
 
 
-          {/* ================================================== */}
           {/* MOBILE HAMBURGER */}
-          {/* ================================================== */}
 
           <button
             type="button"
             onClick={() =>
-              setMobileOpen(
-                (current) => !current
-              )
+              setMobileOpen((current) => !current)
             }
             aria-label={
               mobileOpen
@@ -462,64 +416,39 @@ function Navbar() {
 
             <nav className="flex flex-col gap-1">
 
-              {/* MARKETS */}
+              {/* MOBILE NAVIGATION LINKS */}
 
-              <a
-                href="#markets"
-                onClick={() =>
-                  setMobileOpen(false)
-                }
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  rounded-xl
-                  px-4
-                  py-4
-                  text-sm
-                  font-semibold
-                  text-white/60
-                  transition
-                  hover:bg-white/[0.04]
-                  hover:text-white
-                "
-              >
+              {links.map((link) => (
 
-                Markets
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() =>
+                    setMobileOpen(false)
+                  }
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    rounded-xl
+                    px-4
+                    py-4
+                    text-sm
+                    font-semibold
+                    text-white/60
+                    transition
+                    hover:bg-white/[0.04]
+                    hover:text-white
+                  "
+                >
 
-                <ArrowUpRight size={16} />
+                  {link.name}
 
-              </a>
+                  <ArrowUpRight size={16} />
 
+                </a>
 
-              {/* PORTFOLIO */}
-
-              <a
-                href="#portfolio"
-                onClick={() =>
-                  setMobileOpen(false)
-                }
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  rounded-xl
-                  px-4
-                  py-4
-                  text-sm
-                  font-semibold
-                  text-white/60
-                  transition
-                  hover:bg-white/[0.04]
-                  hover:text-white
-                "
-              >
-
-                Portfolio
-
-                <ArrowUpRight size={16} />
-
-              </a>
+              ))}
 
 
               {/* LAUNCH LAB */}
@@ -668,9 +597,7 @@ function Navbar() {
                 lg:tracking-[0.22em]
               "
             >
-
               Market Pulse
-
             </span>
 
           </div>
@@ -693,15 +620,11 @@ function Navbar() {
 
           {nifty ? (
 
-            <Ticker
-              index={nifty}
-            />
+            <Ticker index={nifty} />
 
           ) : (
 
-            <LoadingTicker
-              name="NIFTY 50"
-            />
+            <LoadingTicker name="NIFTY 50" />
 
           )}
 
@@ -723,15 +646,11 @@ function Navbar() {
 
           {sensex ? (
 
-            <Ticker
-              index={sensex}
-            />
+            <Ticker index={sensex} />
 
           ) : (
 
-            <LoadingTicker
-              name="SENSEX"
-            />
+            <LoadingTicker name="SENSEX" />
 
           )}
 
@@ -747,9 +666,7 @@ function Navbar() {
                 text-red-300/70
               "
             >
-
               Live data unavailable
-
             </span>
 
           )}
@@ -761,6 +678,7 @@ function Navbar() {
     </header>
 
   );
+
 }
 
 
@@ -821,9 +739,7 @@ function IndexMini({
             text-white/25
           "
         >
-
           NIFTY 50
-
         </div>
 
 
@@ -852,6 +768,7 @@ function IndexMini({
     </div>
 
   );
+
 }
 
 
@@ -908,9 +825,7 @@ function Ticker({
           lg:tracking-[0.12em]
         "
       >
-
         {index.name}
-
       </span>
 
 
@@ -925,11 +840,9 @@ function Ticker({
           lg:text-[16px]
         "
       >
-
         {formatNumber(
           index.price
         )}
-
       </span>
 
 
@@ -968,6 +881,7 @@ function Ticker({
     </div>
 
   );
+
 }
 
 
@@ -1000,9 +914,7 @@ function LoadingTicker({
           sm:text-[10px]
         "
       >
-
         {name}
-
       </span>
 
 
@@ -1012,14 +924,13 @@ function LoadingTicker({
           text-white/20
         "
       >
-
         Loading...
-
       </span>
 
     </div>
 
   );
+
 }
 
 

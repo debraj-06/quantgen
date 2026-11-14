@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Markets from "./components/Markets";
 import PortfolioOptimizer from "./components/PortfolioOptimizer";
+import Tracker from "./components/Tracker";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Markets />
 
         <PortfolioOptimizer />
+
+        <Tracker />
       </main>
     </div>
   );
