@@ -16,7 +16,7 @@ import {
 } from "../services/marketApi";
 
 
-function Navbar() {
+function Navbar({ currentUser, onLogin, onLogout }) {
 
   const [mobileOpen, setMobileOpen] =
     useState(false);
@@ -33,18 +33,9 @@ function Navbar() {
   // ======================================================
 
   const links = [
-    {
-      name: "Markets",
-      href: "#markets",
-    },
-    {
-      name: "Portfolio",
-      href: "#portfolio",
-    },
-    {
-      name: "Tracker",
-      href: "#tracker",
-    },
+    { name: "Markets", href: "#markets" },
+    { name: "Portfolio", href: "#portfolio" },
+    ...(currentUser ? [{ name: "Tracker", href: "#tracker" }] : []),
   ];
 
 
@@ -336,7 +327,14 @@ function Navbar() {
               <ArrowUpRight size={16} />
 
             </a>
-
+            {currentUser ? (
+              <div className="flex items-center gap-2">
+                <span className="max-w-[110px] truncate text-xs font-semibold text-emerald-200">Hi, {currentUser.name}</span>
+                <button type="button" onClick={onLogout} className="rounded-xl border border-white/10 px-3 py-2.5 text-xs font-bold text-white/60 hover:border-red-300/30 hover:text-red-200">Log out</button>
+              </div>
+            ) : (
+              <button type="button" onClick={onLogin} className="rounded-xl border border-emerald-300/30 px-4 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-300/10">Log in</button>
+            )}
           </div>
 
 
@@ -481,6 +479,14 @@ function Navbar() {
                 <ArrowUpRight size={16} />
 
               </a>
+              {currentUser ? (
+                <div className="mt-3 flex items-center justify-between rounded-xl border border-white/[0.07] px-4 py-3">
+                  <span className="truncate text-xs font-semibold text-emerald-200">Hi, {currentUser.name}</span>
+                  <button type="button" onClick={() => { onLogout?.(); setMobileOpen(false); }} className="text-xs font-bold text-red-200">Log out</button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => { onLogin?.(); setMobileOpen(false); }} className="mt-3 rounded-xl border border-emerald-300/30 px-4 py-3 text-sm font-bold text-emerald-200">Log in / Sign up</button>
+              )}
 
 
               {/* MOBILE LIVE STATUS */}

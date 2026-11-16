@@ -18,6 +18,7 @@ import {
   analyzeTracker,
   searchStocks,
 } from "../services/marketApi";
+import { supabase } from "../lib/supabase";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("en-IN", {
@@ -58,7 +59,7 @@ function getStockDetails(stock) {
   };
 }
 
-function Tracker() {
+function Tracker({ userId }) {
   const [holdings, setHoldings] = useState([
     {
       id: 1,
@@ -76,6 +77,23 @@ function Tracker() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadSavedHoldings() {
+      const { data, error } = await supabase
+        .from("portfolio_holdings")
+        .select("id, symbol, purchase_date, purchase_time, invested_amount")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true });
+      if (error) { console.error("Could not load saved holdings:", error); return; }
+      if (!cancelled && data?.length) {
+        setHoldings(data.map((item, index) => ({ ...item, id: item.id || index + 1, invested_amount: String(item.invested_amount) })));
+      }
+    }
+    if (userId) loadSavedHoldings();
+    return () => { cancelled = true; };
+  }, [userId]);
 
   const activeHolding = useMemo(
     () => holdings.find((item) => item.id === activeSearchId),
@@ -211,6 +229,19 @@ function Tracker() {
     try {
       const data = await analyzeTracker(validHoldings);
       setResult(data);
+      const rows = validHoldings.map((item) => ({
+        user_id: userId,
+        symbol: item.symbol,
+        purchase_date: item.purchase_date,
+        purchase_time: item.purchase_time,
+        invested_amount: item.invested_amount,
+      }));
+      const { error: deleteError } = await supabase
+        .from("portfolio_holdings").delete().eq("user_id", userId);
+      if (deleteError) throw deleteError;
+      const { error: insertError } = await supabase
+        .from("portfolio_holdings").insert(rows);
+      if (insertError) throw insertError;
     } catch (err) {
       setError(
         err.message || "Unable to analyze your portfolio."
